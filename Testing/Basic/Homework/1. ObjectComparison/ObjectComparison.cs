@@ -15,6 +15,24 @@ public class ObjectComparison
     private static Person person2Parents = new Person("1", 1, 1, 1, new Person("2", 2, 2, 2, new Person("3", 3, 3, 3, null)));
     private static Person person2ParentsCopy = new Person("1", 1, 1, 1, new Person("2", 2, 2, 2, new Person("3", 3, 3, 3, null)));
     #endregion
+    
+    private static IEnumerable<TestCaseData> TsarCheck_FailCases()
+    {
+        var tsarFailedCopy = new Person("Ivan IV The", 54, 170, 70, new Person("Vasili III of Russia", 28, 170, 60, null));
+
+        yield return new TestCaseData(currentTsar, tsarFailedCopy).SetName("Проверка неправильного царя");
+        yield return new TestCaseData(person0Parents, person1ParentsСopy).SetName("Разный родитель");
+        yield return new TestCaseData(person1Parents, person2ParentsCopy).SetName("Разный родитель у родителя");
+        yield return new TestCaseData(currentTsar, person0Parents).SetName("Полностью разные");
+    }
+
+    [Test, TestCaseSource(nameof(TsarCheck_FailCases))]
+    public void FailCheckCurrentTsar(Person? actualTsar, Person? expectedTsar)
+    {
+        Action act = () => AreEqualFuent(actualTsar, expectedTsar);
+        act.Should().Throw<AssertionException>();
+    }
+    
     private static IEnumerable<TestCaseData> TsarCheck_Cases()
     {
         yield return new TestCaseData(null, null).SetName("Пустые аргументы");
@@ -22,17 +40,7 @@ public class ObjectComparison
         yield return new TestCaseData(person0Parents, person0ParentsCopy).SetName("Нет родителя");
         yield return new TestCaseData(person1Parents, person1ParentsСopy).SetName("Есть родитель");
         yield return new TestCaseData(person2Parents, person2ParentsCopy).SetName("Родитель у родителя");
-    }
-
-    private static IEnumerable<TestCaseData> TsarCheck_FailCases()
-    {
-        var tsarCopy = new Person("Ivan IV The", 54, 170, 70, new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        yield return new TestCaseData(currentTsar, tsarCopy).SetName("Проверка неправильного царя");
-        yield return new TestCaseData(person0Parents, person1ParentsСopy).SetName("Разный родитель");
-        yield return new TestCaseData(person1Parents, person2ParentsCopy).SetName("Разный родитель у родителя");
-        yield return new TestCaseData(currentTsar, person0Parents).SetName("Полностью разные");
-    }
+    }  
 
     [Test, TestCaseSource(nameof(TsarCheck_Cases))]
     [Description("Проверка текущего царя")]
@@ -43,19 +51,12 @@ public class ObjectComparison
         AreEqualFuent(actualTsar, expectedTsar);
     }
 
-    [Test, TestCaseSource(nameof(TsarCheck_FailCases))]
-    public void FailCheckCurrentTsar(Person? actualTsar, Person? expectedTsar)
-    {
-        Action act = () => AreEqualFuent(actualTsar, expectedTsar);
-        act.Should().Throw<AssertionException>();
-    }
-
     private void AreEqualFuent(Person? actual, Person? expected)
     {
         actual.Should().BeEquivalentTo(expected, options =>
             options
                 .Excluding(t => t.Id)
-                .Excluding(t => t.Parent!) // Игнорировать Parent
+                .Excluding(t => t.Parent) // Игнорировать Parent
         );
         if (actual != null && expected != null)
         {
@@ -66,7 +67,7 @@ public class ObjectComparison
             if (actual.Parent == null || expected.Parent == null)
             {
                 actual.Parent.Should().BeNull();
-                expected.Parent.Should().BeNull(); // Если один из родителей null то оба должны быть null
+                expected.Parent.Should().BeNull();
             }
         }        
     }
