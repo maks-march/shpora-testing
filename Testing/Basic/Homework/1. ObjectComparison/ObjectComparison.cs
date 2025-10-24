@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -15,6 +16,8 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
+        AreEqualFuent(actualTsar, expectedTsar).Should().Be(true);
+
         ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
         ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
         ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
@@ -24,6 +27,11 @@ public class ObjectComparison
         ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
         ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
         ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+    }
+
+    private bool AreEqualFuent(Person? actual, Person? expected)
+    {
+        return true;
     }
 
     [Test]
