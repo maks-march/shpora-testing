@@ -18,4 +18,13 @@ public class Person
         Weight = weight;
         Parent = parent;
     }
+
+    public static Person? Copy(Person? source)
+    {
+        if (source is null)
+        {
+            return null;
+        }
+        return new Person(source.Name, source.Age, source.Height, source.Weight, Person.Copy(source.Parent));
+    }
 }
