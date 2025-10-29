@@ -6,10 +6,10 @@ public class Person
     public static int IdCounter = 0;
     public int Age, Height, Weight;
     public string Name;
-    public Person Parent;
+    public Person? Parent;
     public int Id;
 
-    public Person(string name, int age, int height, int weight, Person parent)
+    public Person(string name, int age, int height, int weight, Person? parent)
     {
         Id = IdCounter++;
         Name = name;
@@ -18,6 +18,8 @@ public class Person
         Weight = weight;
         Parent = parent;
     }
+    
+    public Person? Copy() => Copy(this)!;
 
     public static Person? Copy(Person? source)
     {
@@ -25,6 +27,7 @@ public class Person
         {
             return null;
         }
-        return new Person(source.Name, source.Age, source.Height, source.Weight, Person.Copy(source.Parent));
+        return new Person(source.Name, source.Age, source.Height, source.Weight, Person.Copy(source.Parent!)!);
     }
+
 }

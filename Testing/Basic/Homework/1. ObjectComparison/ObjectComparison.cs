@@ -12,14 +12,14 @@ public class ObjectComparison
     private static Person tsarCopyDifferent = new Person("Ivan IV The Kind", 54, 170, 70, new Person("Vasili III of Russia", 28, 170, 60, null));
 
     private static Person person0Parents = new Person("1", 1, 1, 1, null);
-    private static Person person0ParentsCopy = Person.Copy(person0Parents);
+    private static Person person0ParentsCopy = person0Parents.Copy()!;
     private static Person person0ParentsLimits = new Person(string.Empty, int.MaxValue, int.MinValue, 0, null);
-    private static Person person0ParentsLimitsCopy = Person.Copy(person0ParentsLimits);
+    private static Person person0ParentsLimitsCopy = person0ParentsLimits.Copy()!;
     private static Person person1Parents = new Person("1", 1, 1, 1, new Person("2", 2, 2, 2, null));
-    private static Person person1ParentsСopy = Person.Copy(person1Parents);
+    private static Person person1ParentsСopy = person1Parents.Copy()!;
     private static Person person1ParentsDifferent = new Person("1", 1, 1, 1, new Person("3", 3, 3, 3, null));
     private static Person person2Parents = new Person("1", 1, 1, 1, new Person("2", 2, 2, 2, new Person("3", 3, 3, 3, null)));
-    private static Person person2ParentsCopy = Person.Copy(person2Parents);
+    private static Person person2ParentsCopy = person2Parents.Copy()!;
     private static Person person2ParentsDifferent = new Person("1", 1, 1, 1, new Person("2", 2, 2, 2, new Person("5", 5, 5, 5, null)));
     #endregion
     
@@ -81,27 +81,7 @@ public class ObjectComparison
         actual.Should().BeEquivalentTo(expected, options =>
             options
                 .Excluding(t => t.Id)
-                .Using<Person>(ctx =>
-                    {
-                        AreEqual_NotThrows_OnEqualFields(ctx.Subject, ctx.Expectation);
-                        if (ctx.Subject != null && ctx.Expectation != null)
-                        {
-                            if (ctx.Subject.Parent != null && ctx.Expectation.Parent != null)
-                            {
-                                AreEqual_NotThrows_OnEqualPersons(ctx.Subject.Parent, ctx.Expectation.Parent);
-                            }
-                            else
-                            {
-                                ctx.Subject.Parent.Should().BeEquivalentTo(ctx.Expectation.Parent, options =>
-                                    options
-                                        .Excluding(t => t.Id)
-                                        .Excluding(t => t.Parent)
-                                );
-                            }
-                        }                        
-                    }
-                )
-                .WhenTypeIs<Person>()
+                .Excluding(t => t.Path.EndsWith("Id"))
         ); 
     }
 
@@ -122,27 +102,11 @@ public class ObjectComparison
         actual.Should().NotBeEquivalentTo(expected, options =>
             options
                 .Excluding(t => t.Id)
-                .Using<Person>(ctx =>
-                    {
-                        AreEqual_NotThrows_OnEqualFields(ctx.Subject, ctx.Expectation);
-                        if (ctx.Subject != null && ctx.Expectation != null)
-                        {
-                            if (ctx.Subject.Parent != null && ctx.Expectation.Parent != null)
-                            {
-                                AreEqual_NotThrows_OnEqualPersons(ctx.Subject.Parent, ctx.Expectation.Parent);
-                            }
-                            else
-                            {
-                                (ctx.Subject.Parent == null && ctx.Expectation.Parent == null).Should().BeTrue();
-                            }
-                        }
-                    }
-                )
-                .WhenTypeIs<Person>()
+                .Excluding(t => t.Path.EndsWith("Id"))
         );
     }
     
-    //Как будто бы если оставлять обобщенный метод кода становится меньше
+    // А что так можно было что ли?
 
     // При добавлении новых полей в Person придется расширять условие в return еще больше;
     // Тест должен пройти по всем Parent прежде чем дать результат, 
